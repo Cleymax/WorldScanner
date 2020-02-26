@@ -1,5 +1,9 @@
+import os
 from argparse import ArgumentParser
-from optparse import OptionParser, OptionGroup
+
+from nbt.world import WorldFolder
+
+from player import Player
 
 
 def main():
@@ -17,11 +21,8 @@ def main():
     parser.add_argument('--player', action='store_true', help='search in player data file', default=True)
     parser.add_argument('--container', action='store_true', help='search in container in world')
     parser.add_argument('--tile-entity', action='store_true', help='search in title entities in world')
-    parser.add_argument('--inventory', action='store_true', help='search in player''s inventory')
-    parser.add_argument('--enderchest', action='store_true', help='search in player''s enderchest')
-
-    parser.add_argument('-x', dest='chunk', help='x coordinate of a chunk')
-    parser.add_argument('-z', dest='chunk', help='z coordinate of a chunk')
+    parser.add_argument('--inventory', action='store_true', help='search in player''s inventory', default=True)
+    parser.add_argument('--enderchest', action='store_true', help='search in player''s enderchest', default=True)
 
     parser.add_argument('--containers',
                         choices=['chest', 'trapped_chest', 'dropper', 'dispenser', 'hopper', 'armorstand', 'item',
@@ -37,6 +38,15 @@ def main():
                               help='list of item to search in the world')
 
     args = parser.parse_args()
+
+    if not args.world or not args.id:
+        parser.print_help()
+
+    if not os.path.exists(args.world):
+        parser.error('World not found !')
+
+    player = Player(args)
+    player.scan()
 
 
 if __name__ == '__main__':
